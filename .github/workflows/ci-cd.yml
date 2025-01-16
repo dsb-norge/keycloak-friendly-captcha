@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -48,3 +49,16 @@ jobs:
         run: mvn --quiet --batch-mode deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ci-cd-conclusion:
+    name: CI/CD Conclusion
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check build matrix status
+        if: needs.build.result != 'success'
+        run: exit 1
+      - name: Build successful
+        if: needs.build.result == 'success'
+        run: echo "All build steps completed successfully"
