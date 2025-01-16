@@ -36,14 +36,14 @@ jobs:
           fi
           
       - name: Update Maven version
-        run: mvn versions:set -DnewVersion="${{ env.NEW_VERSION }}"
+        run: mvn --quiet versions:set -DnewVersion="${{ env.NEW_VERSION }}"
         
       - name: Build and verify
-        run: mvn clean verify
+        run: mvn --quiet clean verify
         
       - name: Deploy to GitHub Packages
         # Only deploy on pushes to main (not on PRs)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: mvn --batch-mode deploy -DskipTests
+        run: mvn --quiet --batch-mode deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
