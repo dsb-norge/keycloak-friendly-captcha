@@ -28,12 +28,13 @@ jobs:
           
       - name: Determine version
         run: |
-          CURRENT_TIMESTAMP=$(date +'%Y.%m.%d.%s')
+          VERSION_DATE=$(date +%Y.%m.%d)
+          SECONDS_TODAY=$(( $(date +%s) - $(date -d 'today 00:00:00' +%s) ))
+          APP_VERSION="${VERSION_DATE}.${SECONDS_TODAY}"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "NEW_VERSION=${CURRENT_TIMESTAMP}-SNAPSHOT" >> $GITHUB_ENV
-          else
-            echo "NEW_VERSION=${CURRENT_TIMESTAMP}" >> $GITHUB_ENV
+            APP_VERSION="pr-${{ github.event.number }}-${APP_VERSION}"
           fi
+          echo "NEW_VERSION=${APP_VERSION}" >> $GITHUB_ENV
           
       - name: Update Maven version
         run: mvn --quiet versions:set -DnewVersion="${{ env.NEW_VERSION }}"
