@@ -1,0 +1,12 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    pull_policy: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./target/keycloak-friendly-captcha-1.0-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-friendly-captcha.jar"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: start-dev

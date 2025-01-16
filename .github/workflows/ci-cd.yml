@@ -1,0 +1,29 @@
+name: 'CI/CD'
+
+on:
+  # Run on main branch for PR default events + closed event
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, closed]
+  # Allow manual build
+  workflow_dispatch:
+
+# Only one workflow at a time for a given branch or tag
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  ci-cd:
+    uses: dsb-norge/github-actions/.github/workflows/ci-cd-build-deploy-maven-lib.yml@v2
+    secrets: inherit # pass all secrets, ok since we trust our own workflow
+    with:
+      apps: |
+        - application-name: keycloak-friendly-captcha
+          application-source-path: ./pom.xml
+          application-type: maven-library
+          application-description: Plugin that adds the ability to use FriendlyCaptcha as a flow step
+          maven-build-project-deploy-release-artifacts: true
+          maven-build-project-deploy-snapshot-artifacts: true
