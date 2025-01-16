@@ -1,4 +1,4 @@
-name: 'CI/CD'
+name: 'ci-cd'
 
 on:
   push:
@@ -51,7 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   ci-cd-conclusion:
-    name: CI/CD Conclusion
+    name: ci-cd-conclusion
     needs: build
     runs-on: ubuntu-latest
     if: always()
