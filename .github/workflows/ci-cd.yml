@@ -1,71 +1,42 @@
-name: 'ci-cd'
+name: 'CI/CD'
 
 on:
+  # Run on main branch for PR default events + closed event
   push:
     branches:
       - main
   pull_request:
     branches:
       - main
+    types: [opened, synchronize, reopened, closed]
+  # Allow manual build
+  workflow_dispatch:
 
-permissions:
-  contents: read
-  packages: write
+# Only one workflow at a time for a given branch or tag
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  build-and-deploy:
-    name: Build and deploy to artifact repo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-          server-id: github
-          cache: maven
-
-      - name: Determine version
-        run: |
-          VERSION_DATE=$(date +%Y.%m.%d)
-          SECONDS_TODAY=$(( $(date +%s) - $(date -d 'today 00:00:00' +%s) ))
-          APP_VERSION="${VERSION_DATE}.${SECONDS_TODAY}"
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            APP_VERSION="pr-${{ github.event.number }}-${APP_VERSION}"
-          fi
-          echo "NEW_VERSION=${APP_VERSION}" >> $GITHUB_ENV
-
-      - name: Update Maven version
-        run: mvn --quiet versions:set -DnewVersion="${{ env.NEW_VERSION }}"
-
-      - name: Build and verify
-        run: mvn --quiet clean verify
-
-      - name: Deploy to GitHub Packages
-        # Only deploy on pushes to main (not on PRs)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: mvn --quiet --batch-mode deploy -DskipTests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # create a global result indicating if workflow steps succeeded or not,
-  # handy for branch protection rules
-  ci-cd-conclusion:
-    if: always()
-    name: ci-cd-conclusion
-    needs: [ build-and-deploy ]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - run: exit 1
-        # for explanation of '>-' below see https://stackoverflow.com/a/67532120/4907315
-        # job 'result': possible values are 'success', 'failure', 'cancelled', or 'skipped'
-        if: >-
-          ${{
-               contains(needs.*.result, 'failure')
-            || contains(needs.*.result, 'cancelled')
-          }}
+  ci-cd:
+    uses: dsb-norge/github-actions/.github/workflows/ci-cd-build-deploy-maven-lib.yml@v2
+    secrets: inherit # pass all secrets, ok since we trust our own workflow
+    with:
+      apps: |
+        - application-name: keycloak-friendly-captcha
+          application-source-path: ./pom.xml
+          application-type: maven-library
+          application-description: Plugin that adds the ability to use FriendlyCaptcha as a flow step
+          maven-build-project-deploy-release-artifacts: true
+          maven-build-project-deploy-snapshot-artifacts: true
+          jasypt-password: "not in use"
+          maven-extra-envs-from-github-yml: |
+            from-github-context:
+              GH_ACTION_ACTOR: "actor"
+              GH_ACTION_ACTOR_TOKEN: "token"
+          maven-user-settings-repositories-yml: |
+            repositories:
+              # for publishing artifacts to the calling repo
+              - id: "calling-repo"
+                name: "Calling GitHub repo"
+                url: "https://maven.pkg.github.com/{{ github.repository }}"
+                username: "${env.GH_ACTION_ACTOR}"        # the GitHub action actor
+                password: "${env.GH_ACTION_ACTOR_TOKEN}"  # the GitHub action actor's token
