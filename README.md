@@ -58,14 +58,25 @@ Add the following code to the `register.ftl` file in your theme to render the Fr
 
 ```html
 <#if friendlyCaptchaRequired??>
-  <div
-    class="frc-captcha"
-    data-sitekey="${friendlyCaptchaSiteKey}"
-    data-start="focus"
-    data-lang="${friendlyCaptchaLang}"
-    data-solution-field-name="${friendlyCaptchaFormAttribute}"
-    data-puzzle-endpoint="${friendlyCaptchaApiDomain}/api/v1/puzzle"
-  ></div>
+  <div class="form-group">
+    <div class="${properties.kcInputWrapperClass!}">
+      <div
+        class="frc-captcha"
+        data-sitekey="${friendlyCaptchaSiteKey}"
+        data-start="focus"
+        <#if friendlyCaptchaV2>
+          lang="${friendlyCaptchaLang}"
+          data-api-endpoint="${friendlyCaptchaApiDomain}/api/v2/captcha"
+          data-form-field-name="${friendlyCaptchaFormAttribute}"
+          data-theme="auto"
+        <#else>
+          data-lang="${friendlyCaptchaLang}"
+          data-puzzle-endpoint="${friendlyCaptchaApiDomain}/api/v1/puzzle"
+          data-solution-field-name="${friendlyCaptchaFormAttribute}"
+        </#if>
+      ></div>
+    </div>
+  </div>
 </#if>
 ```
 
@@ -82,8 +93,11 @@ For local development, you can use the provided Docker Compose file:
 mvn clean package
 docker-compose up
 ```
-
 This will start Keycloak with the plugin pre-installed at http://localhost:8080.
+
+### Update included javascript scripts
+
+The plugin includes the Friendly Captcha javascript scripts in [Resources](src/main/resources/theme/base/login/resources/js) directory. To update these scripts, download the latest version from a CDN and replace the existing files.
 
 ## Contributing
 
