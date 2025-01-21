@@ -1,0 +1,42 @@
+name: 'CI/CD'
+
+on:
+  # Run on main branch for PR default events + closed event
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened, closed]
+  # Allow manual build
+  workflow_dispatch:
+
+# Only one workflow at a time for a given branch or tag
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  ci-cd:
+    uses: dsb-norge/github-actions/.github/workflows/ci-cd-build-deploy-maven-lib.yml@v2
+    secrets: inherit # pass all secrets, ok since we trust our own workflow
+    with:
+      apps: |
+        - application-name: keycloak-friendly-captcha
+          application-source-path: ./pom.xml
+          application-type: maven-library
+          application-description: Plugin that adds the ability to use FriendlyCaptcha as a flow step
+          maven-build-project-deploy-release-artifacts: true
+          maven-build-project-deploy-snapshot-artifacts: true
+          jasypt-password: "not in use"
+          maven-extra-envs-from-github-yml: |
+            from-github-context:
+              GH_ACTION_ACTOR: "actor"
+              GH_ACTION_ACTOR_TOKEN: "token"
+          maven-user-settings-repositories-yml: |
+            repositories:
+              # for publishing artifacts to the calling repo
+              - id: "calling-repo"
+                name: "Calling GitHub repo"
+                url: "https://maven.pkg.github.com/{{ github.repository }}"
+                username: "${env.GH_ACTION_ACTOR}"        # the GitHub action actor
+                password: "${env.GH_ACTION_ACTOR_TOKEN}"  # the GitHub action actor's token
