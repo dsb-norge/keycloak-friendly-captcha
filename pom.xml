@@ -155,6 +155,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${versions-surefire.version}</version>
+                <configuration>
+                    <argLine>${jacoco.argLine}</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
