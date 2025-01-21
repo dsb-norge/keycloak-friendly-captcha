@@ -1,18 +1,19 @@
-
 package no.dsb.keycloak.keycloak_friendly_captcha.wrappers
 
 import com.google.gson.JsonParser
+import no.dsb.keycloak.keycloak_friendly_captcha.client.CaptchaHttpClient
+import no.dsb.keycloak.keycloak_friendly_captcha.client.DefaultCaptchaHttpClient
+import no.dsb.keycloak.keycloak_friendly_captcha.dto.CaptchaResponse
+import no.dsb.keycloak.keycloak_friendly_captcha.dto.ErrorResponse
 import org.apache.http.client.HttpClient
-import org.apache.http.client.entity.UrlEncodedFormEntity
-import org.apache.http.client.methods.HttpPost
 import org.apache.http.message.BasicNameValuePair
-import org.apache.http.util.EntityUtils
 import org.jboss.logging.Logger
 
 class HttpClientWrapper(
-    private val httpClient: HttpClient,
+    private val httpClient: CaptchaHttpClient,
     private val config: ConfigWrapper
 ) {
+    constructor(httpClient: HttpClient, config: ConfigWrapper) : this(DefaultCaptchaHttpClient(httpClient), config)
 
     companion object {
         private val LOGGER = Logger.getLogger(HttpClientWrapper::class.java)
@@ -26,47 +27,77 @@ class HttpClientWrapper(
         "${config.getApiDomain()}/api/v1/siteverify"
     }
 
-    private fun addSecret(formData: MutableList<BasicNameValuePair>, post: HttpPost) {
-        if (config.useVersion2()) {
-            post.setHeader("X-API-Key", config.getSecretKey())
-        } else {
-            formData.add(BasicNameValuePair("secret", config.getSecretKey()))
-        }
+    fun verifyFriendlyCaptcha(captcha: String): Boolean {
+        val response = validateFriendlyCaptcha(captcha)
+        return verifyFriendlyCaptchaResponse(response)
     }
 
-    fun verifyFriendlyCaptcha(
-        captcha: String,
-    ): Boolean {
-        val post = HttpPost(apiUrl)
+    fun validateFriendlyCaptcha(captcha: String): CaptchaResponse {
+        val headers = mutableMapOf(
+            "Content-Type" to "application/x-www-form-urlencoded"
+        )
+
         val formData = mutableListOf(
             BasicNameValuePair(formSolutionKey, captcha),
             BasicNameValuePair("sitekey", config.getSiteKey())
         )
 
-        addSecret(formData, post)
-
-        post.entity = UrlEncodedFormEntity(formData)
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded")
+        if (config.useVersion2()) {
+            headers["X-API-Key"] = config.getSecretKey()
+        } else {
+            formData.add(BasicNameValuePair("secret", config.getSecretKey()))
+        }
 
         return try {
-            val response = httpClient.execute(post)
-            val responseString = EntityUtils.toString(response.entity)
+            val (httpStatus, responseString) = httpClient.executePost(apiUrl, headers, formData)
             val jsonResponse = JsonParser.parseString(responseString).asJsonObject
 
-            val errors = jsonResponse.getAsJsonArray("errors")
-
-            if (jsonResponse.has("success")) {
-                jsonResponse.get("success").asBoolean
-            } else if (response.statusLine.statusCode >= 400 && config.getFailOnError()) {
-                LOGGER.error("Captcha validation failed with HTTP status code ${response.statusLine.statusCode}, errors: $errors, but allowing user to continue. You should look into this.")
-                true
-            } else {
-                LOGGER.warn("Captcha validation failed with errors: $errors")
-                false
-            }
+            CaptchaResponse(
+                statusCode = httpStatus,
+                success = jsonResponse.get("success")?.asBoolean == true,
+                errors = if (jsonResponse.has("errors")) {
+                    jsonResponse.getAsJsonArray("errors").map { it.asString }
+                } else {
+                    emptyList()
+                },
+                error = if (jsonResponse.has("error")) {
+                    val errorObj = jsonResponse.getAsJsonObject("error")
+                    ErrorResponse(
+                        error_code = errorObj.get("error_code").asString,
+                        detail = errorObj.get("detail").asString
+                    )
+                } else {
+                    null
+                }
+            )
+        } catch (e: IllegalStateException) {
+            LOGGER.error("Error parsing captcha response", e)
+            CaptchaResponse(success = !config.getFailOnError(), statusCode = -1)
         } catch (e: Exception) {
             LOGGER.error("Error validating captcha", e)
-            false
+            CaptchaResponse(success = !config.getFailOnError(), statusCode = -1)
+        }
+    }
+
+    fun verifyFriendlyCaptchaResponse(response: CaptchaResponse): Boolean {
+        return when {
+            response.success -> true
+            !config.getFailOnError() && response.statusCode >= 400 -> {
+                LOGGER.error("Captcha validation failed with HTTP status code ${response.statusCode}, response: $response, but allowing user to continue. You should look into this.")
+                true
+            }
+            response.errors.isNotEmpty() -> {
+                LOGGER.warn("Captcha validation failed with v1 errors: ${response.errors}")
+                false
+            }
+            response.error != null -> {
+                LOGGER.warn("Captcha validation failed with v2 error: code=${response.error.error_code}, detail=${response.error.detail}")
+                false
+            }
+            else -> {
+                LOGGER.warn("Unexpected response format: $response")
+                false
+            }
         }
     }
 }

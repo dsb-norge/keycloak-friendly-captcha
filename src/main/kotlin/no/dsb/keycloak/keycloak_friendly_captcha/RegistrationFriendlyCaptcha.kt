@@ -1,10 +1,6 @@
 package no.dsb.keycloak.keycloak_friendly_captcha
 
-import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.ConfigWrapper
-import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.FormContextWrapper
-import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.HttpClientWrapper
-import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.LoginFormsProviderWrapper
-import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.ValidationContextWrapper
+import no.dsb.keycloak.keycloak_friendly_captcha.wrappers.*
 import org.jboss.logging.Logger
 import org.keycloak.Config
 import org.keycloak.authentication.FormAction
@@ -14,7 +10,6 @@ import org.keycloak.authentication.ValidationContext
 import org.keycloak.connections.httpclient.HttpClientProvider
 import org.keycloak.forms.login.LoginFormsProvider
 import org.keycloak.models.*
-import org.keycloak.models.utils.FormMessage
 import org.keycloak.provider.ProviderConfigProperty
 import org.keycloak.services.validation.Validation
 
@@ -122,7 +117,14 @@ class RegistrationFriendlyCaptcha : FormAction, FormActionFactory {
             httpClient = context.session.getProvider(HttpClientProvider::class.java).httpClient,
             config = config
         )
+        validate(captchaResponse, httpClientWrapper, contextWrapper)
+    }
 
+    fun validate(
+        captchaResponse: String,
+        httpClientWrapper: HttpClientWrapper,
+        contextWrapper: ValidationContextWrapper
+    ) {
         LOGGER.trace("Got captcha: $captchaResponse")
         if (!Validation.isBlank(captchaResponse) && httpClientWrapper.verifyFriendlyCaptcha(captchaResponse)) {
             LOGGER.trace("Captcha validation successful")

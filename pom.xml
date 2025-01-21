@@ -29,6 +29,7 @@
         <mockito.version>5.14.2</mockito.version>
         <assertj.version>3.26.3</assertj.version>
         <hamcrest.version>3.0</hamcrest.version>
+        <jersey.version>3.1.2</jersey.version>
 
         <!-- Sonar properties -->
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -92,6 +93,13 @@
             <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
