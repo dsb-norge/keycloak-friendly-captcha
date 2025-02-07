@@ -42,6 +42,9 @@ A Keycloak authentication plugin that integrates [Friendly Captcha](https://frie
 8. Make sure that the flow you have modified is bound to the "Registration flow"
 9. The Friendly Captcha should now show up in the registration form (Provided you have added the necessary HTML to the registration form)
 
+**Note:** if you are using the v2 version you need to tweak the Content-Security-Policy inside the realm settings under the "Security Defenses" tab.
+Writing: `frame-src 'self' https://global.frcapi.com; frame-ancestors 'self'; object-src 'none';` should be enough. (Or the domain you are using)
+
 ### 2. Configure the Execution
 
 Click the gear icon next to the Friendly Captcha execution and configure:
@@ -79,6 +82,8 @@ Add the following code to the `register.ftl` file in your theme to render the Fr
   </div>
 </#if>
 ```
+
+**Note:** `data-theme="auto"` uses the theme of the client. If you want to use a specific theme, you can set it to `light` or `dark`.
 
 #### Note about *Fail on HTTP status error*: 
 
