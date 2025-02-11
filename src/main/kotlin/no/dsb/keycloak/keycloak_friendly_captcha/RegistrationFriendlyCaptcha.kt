@@ -127,10 +127,10 @@ class RegistrationFriendlyCaptcha : FormAction, FormActionFactory {
     ) {
         LOGGER.trace("Got captcha: $captchaResponse")
         if (!Validation.isBlank(captchaResponse) && httpClientWrapper.verifyFriendlyCaptcha(captchaResponse)) {
-            LOGGER.trace("Captcha validation successful")
+            LOGGER.info("Captcha validation successful")
             contextWrapper.triggerSuccess()
         } else {
-            LOGGER.trace("Captcha validation failed")
+            LOGGER.warn("Captcha validation failed")
             contextWrapper.triggerError("recaptchaFailed")
         }
     }
