@@ -3,6 +3,7 @@ package no.dsb.keycloak.keycloak_friendly_captcha.wrappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.keycloak.authentication.FormContext
+import org.keycloak.common.Version
 import org.keycloak.forms.login.LoginFormsProvider
 import org.keycloak.models.KeycloakContext
 import org.keycloak.models.KeycloakSession
@@ -68,8 +69,8 @@ class FormContextWrapperTest {
         verify(form, times(1)).setAttribute("friendlyCaptchaFormAttribute", "custom-captcha-response")
         verify(form, times(1)).setAttribute("friendlyCaptchaApiDomain", "https://custom.friendlycaptcha.com")
         verify(form, times(1)).setAttribute("friendlyCaptchaV2", false)
-        verify(form, times(1)).addScript("/resources/26.1.0/login/base/js/widget.min.js")
-        verify(form, times(1)).addScript("/resources/26.1.0/login/base/js/widget.module.min.js")
+        verify(form, times(1)).addScript("/resources/${Version.VERSION}/login/base/js/widget.min.js")
+        verify(form, times(1)).addScript("/resources/${Version.VERSION}/login/base/js/widget.module.min.js")
     }
 
     @Test
@@ -93,7 +94,7 @@ class FormContextWrapperTest {
         verify(form, times(1)).setAttribute("friendlyCaptchaFormAttribute", "custom-captcha-response")
         verify(form, times(1)).setAttribute("friendlyCaptchaApiDomain", "https://custom.friendlycaptcha.com")
         verify(form, times(1)).setAttribute("friendlyCaptchaV2", true)
-        verify(form, times(1)).addScript("/resources/26.1.0/login/base/js/widget.v2.min.js")
-        verify(form, times(1)).addScript("/resources/26.1.0/login/base/js/widget.v2.module.min.js")
+        verify(form, times(1)).addScript("/resources/${Version.VERSION}/login/base/js/widget.v2.min.js")
+        verify(form, times(1)).addScript("/resources/${Version.VERSION}/login/base/js/widget.v2.module.min.js")
     }
 }
