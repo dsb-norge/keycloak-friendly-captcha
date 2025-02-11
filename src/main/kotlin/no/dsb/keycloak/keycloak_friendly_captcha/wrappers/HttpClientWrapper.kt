@@ -52,7 +52,7 @@ class HttpClientWrapper(
             val (httpStatus, responseString) = httpClient.executePost(apiUrl, headers, formData)
             val jsonResponse = JsonParser.parseString(responseString).asJsonObject
 
-            CaptchaResponse(
+            val captchaResponse = CaptchaResponse(
                 statusCode = httpStatus,
                 success = jsonResponse.get("success")?.asBoolean == true,
                 errors = if (jsonResponse.has("errors")) {
@@ -70,6 +70,10 @@ class HttpClientWrapper(
                     null
                 }
             )
+            if (!captchaResponse.success) {
+                LOGGER.warn("Captcha validation failed: $captchaResponse")
+            }
+            captchaResponse
         } catch (e: IllegalStateException) {
             LOGGER.error("Error parsing captcha response", e)
             CaptchaResponse(success = !config.getFailOnError(), statusCode = -1)
