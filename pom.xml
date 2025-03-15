@@ -25,7 +25,7 @@
         <versions-jacoco-maven-plugin.version>0.8.12</versions-jacoco-maven-plugin.version>
         <versions-surefire.version>3.5.2</versions-surefire.version>
 
-        <junit.version>5.12.0</junit.version>
+        <junit.version>5.12.1</junit.version>
         <mockito.version>5.16.0</mockito.version>
         <assertj.version>3.27.3</assertj.version>
         <hamcrest.version>3.0</hamcrest.version>
