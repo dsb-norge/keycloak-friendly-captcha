@@ -26,7 +26,7 @@
         <versions-surefire.version>3.5.4</versions-surefire.version>
 
         <junit.version>5.13.4</junit.version>
-        <mockito.version>5.19.0</mockito.version>
+        <mockito.version>5.20.0</mockito.version>
         <assertj.version>3.27.5</assertj.version>
         <hamcrest.version>3.0</hamcrest.version>
         <jersey.version>3.1.11</jersey.version>
