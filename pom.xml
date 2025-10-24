@@ -10,7 +10,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <kotlin.version>2.2.20</kotlin.version>
+        <kotlin.version>2.2.21</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <keycloak.version>26.4.1</keycloak.version>
+        <keycloak.version>26.4.2</keycloak.version>
         <versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
         <versions-maven-shade-plugin.version>3.6.1</versions-maven-shade-plugin.version>
         <versions-jacoco-maven-plugin.version>0.8.14</versions-jacoco-maven-plugin.version>
