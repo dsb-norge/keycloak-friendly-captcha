@@ -20,7 +20,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <keycloak.version>26.4.5</keycloak.version>
-        <versions-maven-plugin.version>2.20.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
         <versions-maven-shade-plugin.version>3.6.1</versions-maven-shade-plugin.version>
         <versions-jacoco-maven-plugin.version>0.8.14</versions-jacoco-maven-plugin.version>
         <versions-surefire.version>3.5.4</versions-surefire.version>
