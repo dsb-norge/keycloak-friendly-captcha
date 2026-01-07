@@ -19,13 +19,13 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <keycloak.version>26.4.7</keycloak.version>
+        <keycloak.version>26.5.0</keycloak.version>
         <versions-maven-plugin.version>2.20.1</versions-maven-plugin.version>
         <versions-maven-shade-plugin.version>3.6.1</versions-maven-shade-plugin.version>
         <versions-jacoco-maven-plugin.version>0.8.14</versions-jacoco-maven-plugin.version>
         <versions-surefire.version>3.5.4</versions-surefire.version>
 
-        <junit.version>5.14.1</junit.version>
+        <junit.version>5.14.2</junit.version>
         <mockito.version>5.21.0</mockito.version>
         <assertj.version>3.27.6</assertj.version>
         <hamcrest.version>3.0</hamcrest.version>
