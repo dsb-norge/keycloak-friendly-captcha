@@ -17,8 +17,9 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   ci-cd:
-    uses: dsb-norge/github-actions/.github/workflows/ci-cd-build-deploy-maven-lib.yml@v2
+    uses: dsb-norge/github-actions/.github/workflows/ci-cd-build-deploy-maven-lib.yml@v4
     secrets: inherit # pass all secrets, ok since we trust our own workflow
+    permissions: write-all # allow all, ok since we trust our own workflow
     with:
       apps: |
         - application-name: keycloak-friendly-captcha
