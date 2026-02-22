@@ -23,7 +23,7 @@
         <versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
         <versions-maven-shade-plugin.version>3.6.1</versions-maven-shade-plugin.version>
         <versions-jacoco-maven-plugin.version>0.8.14</versions-jacoco-maven-plugin.version>
-        <versions-surefire.version>3.5.4</versions-surefire.version>
+        <versions-surefire.version>3.5.5</versions-surefire.version>
 
         <junit.version>5.14.3</junit.version>
         <mockito.version>5.21.0</mockito.version>
