@@ -21,6 +21,7 @@ jobs:
     secrets: inherit # pass all secrets, ok since we trust our own workflow
     permissions: write-all # allow all, ok since we trust our own workflow
     with:
+      runs-on: builder-app-platform-ghr-ubuntu-large
       apps: |
         - application-name: keycloak-friendly-captcha
           application-source-path: ./pom.xml
