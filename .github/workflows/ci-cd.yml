@@ -27,6 +27,10 @@ jobs:
           application-source-path: ./pom.xml
           application-type: maven-library
           application-description: Plugin that adds the ability to use FriendlyCaptcha as a flow step
+          # Default goals include the sonar goal, but the SonarCloud project
+          # dsb-norge_keycloak-friendly-captcha rejects the org token with HTTP 403.
+          # Drop sonar until that project is sorted out.
+          maven-build-project-goals: clean install
           maven-build-project-deploy-release-artifacts: true
           maven-build-project-deploy-snapshot-artifacts: true
           jasypt-password: "not in use"
